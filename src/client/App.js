@@ -1,129 +1,55 @@
-import React from 'react';
-import './App.css';
+import React, {
+  useState, useEffect
+} from 'react';
 
-export default () => (
-  <div className="wrapper">
-    <div className="menu-summary">
-      <div className="container">
+import {useDebouncedCallback} from "use-debounce";
+import {useFetch} from 'use-http'
+
+import './App.css';
+import Item from './components/Item';
+import Sidebar from './components/Sidebar';
+import Summary from './components/Summary';
+
+import {useMenu} from './hooks/use-menu'
+
+const API_ENDPOINT = 'http://localhost:8080/api/items'
+
+export default () => {
+  const [searchTerm, setSearchterm] = useState('')
+  const [onChange] = useDebouncedCallback(setSearchterm, 500)
+  const query = searchTerm ? `?q=${searchTerm}` : ''
+  const {data = {items: []}, loading, error} = useFetch(`${API_ENDPOINT}${query}`, {}, [searchTerm])
+  const {addItemToMenu, items, menuItems, removeItemFromMenu} = useMenu(data.items)
+
+  const loadingMessage = loading ? (<h1 className="message">Loading</h1>) : null;
+  const errorMessage = error ? (<h1 className="message"> Error </h1>) : null;
+
+  return (
+    <div className="wrapper">
+      {loadingMessage}
+      {errorMessage}
+      <div className="menu-summary">
+        <Summary menuItems={menuItems} />
+      </div>
+      <div className="container menu-builder">
         <div className="row">
-          <div className="col-6 menu-summary-left">
-            <span>6 items</span>
-          </div>
-          <div className="col-6 menu-summary-right">
-            6x <span className="dietary">ve</span>
-            4x <span className="dietary">v</span>
-            12x <span className="dietary">n!</span>
+          <Sidebar items={items} onChange={onChange} searchTerm={searchTerm} addItemToMenu={addItemToMenu} />
+          <div className="col-8">
+            <h2>Menu preview</h2>
+            <ul className="menu-preview">
+              {menuItems.map(({dietaries, id, name}) => (
+                <Item
+                  key={`menu-${id}`}
+                  dietaries={dietaries}
+                  id={id}
+                  name={name}
+                  removeItem={() => removeItemFromMenu(id)}
+                />
+              ))}
+            </ul>
           </div>
         </div>
       </div>
     </div>
-    <div className="container menu-builder">
-      <div className="row">
-        <div className="col-4">
-          <div className="filters">
-            <input className="form-control" placeholder="Name" />
-          </div>
-          <ul className="item-picker">
-            <li className="item">
-              <h2>Dummy item</h2>
-              <p>
-                <span className="dietary">ve</span>
-                <span className="dietary">v</span>
-                <span className="dietary">n!</span>
-              </p>
-            </li>
-            <li className="item">
-              <h2>Dummy item</h2>
-              <p>
-                <span className="dietary">ve</span>
-                <span className="dietary">v</span>
-                <span className="dietary">n!</span>
-              </p>
-            </li>
-            <li className="item">
-              <h2>Dummy item</h2>
-              <p>
-                <span className="dietary">ve</span>
-                <span className="dietary">v</span>
-                <span className="dietary">n!</span>
-              </p>
-            </li>
-            <li className="item">
-              <h2>Dummy item</h2>
-              <p>
-                <span className="dietary">ve</span>
-                <span className="dietary">v</span>
-                <span className="dietary">n!</span>
-              </p>
-            </li>
-            <li className="item">
-              <h2>Dummy item</h2>
-              <p>
-                <span className="dietary">ve</span>
-                <span className="dietary">v</span>
-                <span className="dietary">n!</span>
-              </p>
-            </li>
-            <li className="item">
-              <h2>Dummy item</h2>
-              <p>
-                <span className="dietary">ve</span>
-                <span className="dietary">v</span>
-                <span className="dietary">n!</span>
-              </p>
-            </li>
-            <li className="item">
-              <h2>Dummy item</h2>
-              <p>
-                <span className="dietary">ve</span>
-                <span className="dietary">v</span>
-                <span className="dietary">n!</span>
-              </p>
-            </li>
-          </ul>
-        </div>
-        <div className="col-8">
-          <h2>Menu preview</h2>
-          <ul className="menu-preview">
-            <li className="item">
-              <h2>Dummy item</h2>
-              <p>
-                <span className="dietary">ve</span>
-                <span className="dietary">v</span>
-                <span className="dietary">n!</span>
-              </p>
-              <button className="remove-item">x</button>
-            </li>
-            <li className="item">
-              <h2>Dummy item</h2>
-              <p>
-                <span className="dietary">ve</span>
-                <span className="dietary">v</span>
-                <span className="dietary">n!</span>
-              </p>
-              <button className="remove-item">x</button>
-            </li>
-            <li className="item">
-              <h2>Dummy item</h2>
-              <p>
-                <span className="dietary">ve</span>
-                <span className="dietary">v</span>
-                <span className="dietary">n!</span>
-              </p>
-              <button className="remove-item">x</button>
-            </li>
-            <li className="item">
-              <h2>Dummy item</h2>
-              <p>
-                <span className="dietary">ve</span>
-                <span className="dietary">v</span>
-                <span className="dietary">n!</span>
-              </p>
-              <button className="remove-item">x</button>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-);
+  );
+};

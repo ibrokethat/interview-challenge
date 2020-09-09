@@ -3,6 +3,12 @@
   font-family: 'Nunito', sans-serif;
 }
 
+.message {
+  position: absolute;
+  top: 0;
+  left: 100px;
+}
+
 .menu-summary {
   background: #F8F8F8;
   padding: 30px 0;
