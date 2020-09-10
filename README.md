@@ -9,7 +9,7 @@
 
 ## Moving forward, if this were production code I would, in no particular order
 
-* run the linter.
+* run the linter (I've been a bit random with my use of ;).
 * refactor the fetch data code and input field into a reusable component that could be bound to any endpoint (it's not very testable as is).
 * Look at adding Styled Components.
 * Rejig the file structure so each component, test spec and style file lived in it's own directory.
